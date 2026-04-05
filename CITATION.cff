@@ -1,0 +1,46 @@
+# ============================================================
+# CITATION.cff (How to cite this project)
+# ============================================================
+
+# REQ.UNIVERSAL: Professional open projects SHOULD include CITATION.cff.
+# WHY: Support correct citation and attribution.
+# ALT: Internal or private repositories may omit citation metadata.
+# CUSTOM: Update author, repository, license, and keyword fields as needed.
+# USAGE: See https://citation-file-format.github.io/ for details.
+
+cff-version: "1.2.0"
+type: software
+
+title: "Adaptive Onboarding (AO)"
+date-released: "2026-03-31"
+
+authors:
+  - family-names: Case
+    given-names: Denise M.
+    orcid: "https://orcid.org/0000-0001-6165-7389"
+    affiliation: "Northwest Missouri State University, USA"
+
+repository-code: "https://github.com/adaptive-interfaces/adaptive-onboarding"
+url: "https://github.com/adaptive-interfaces/adaptive-onboarding"
+license: MIT
+
+abstract: >
+  A schema and domain skill for capturing team conventions in a
+  persistent, agent-readable format.
+  Defines the AO schema shared by human-authored ao-config files
+  and agent-generated ao-context files,
+  a layered config design for org-wide, language, and type-specific conventions,
+  and a generation skill for producing context documents from repository scans.
+  Operates under the Adaptive Conformance Specification (ACS).
+
+keywords:
+  - agent engineering
+  - team conventions
+  - onboarding
+  - priors
+  - skill specification
+  - context document
+  - AI-assisted development
+  - skill specification
+
+message: "If using this project, please cite it as described in this file."

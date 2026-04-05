@@ -1,0 +1,106 @@
+# .agent/ao-config.toml
+# Adaptive Onboarding (AO)
+# Team-Provided Input Configuration
+# Org-Wide Defaults
+# https://github.com/adaptive-interfaces/adaptive-onboarding
+# This file captures org-wide conventions that apply to ALL repositories.
+# Language-specific and repo-type-specific conventions are in separate files:
+#
+#   ao-config-python.toml          — Python additions
+#   ao-config-python-pypi.toml     — PyPI published repo extensions (adds to python layer)
+#   ao-config-python-scaffold.toml — Course scaffold extensions (relaxed, adds to python layer)
+#   ao-config-node.toml            — Node/npm additions
+#
+# Loading order for an agent session:
+#   1. ao-config.toml              (this file)
+#   2. ao-config-{language}.toml   (if applicable)
+#   3. ao-config-{language}-{type}.toml (if applicable)
+#
+# Later layers override earlier ones on conflict.
+# Conflicts are recorded in meta.divergences, not silently resolved.
+#
+# AO will:
+#   - Accept entries marked confirmed = true without re-inferring
+#   - Verify entries marked confirmed = false against observed code patterns
+#   - Override entries where CI or config files contradict them, and flag the conflict
+#   - Add repo-specific norms, gaps, and divergences not listed here
+
+[owner]
+name = ""                      # [FILL] your name or org name
+github = ""                    # [FILL] e.g., "denisecase" or "adaptive-interfaces"
+best_practices_stance = "balanced"
+# prefer_team     - follow team conventions; flag divergences but do not override
+# balanced        - follow team conventions; flag significant divergences for human review
+# prefer_standard - follow best practices; flag where team conventions differ
+
+[repo]
+# WHY: Tells AO which language and type layers to load.
+# type drives which ao-config-{language}-{type}.toml is applied.
+type = ""   # [FILL] library | app | scaffold | docs | tool | pypi
+            # Leave empty if no type-specific layer applies.
+
+[defaults.conventions]
+naming = "snake_case files/functions/variables; PascalCase classes"
+commit_style = "conventional commits"
+confirmed = false   # verify against observed code patterns before accepting
+
+[defaults.code_style]
+prefer_early_returns = true
+prefer_small_functions = "each function does one thing; extract helpers rather than growing existing functions"
+prefer_flat_over_nested = "flatten conditionals early; avoid pyramid indentation"
+prefer_explicit_over_clever = "readable code over terse code; no one-liners that obscure intent"
+side_effects = "functions must not have hidden side effects; mutations are explicit"
+comment_style = "explain why not what; no commented-out code; use REQ/WHY/OBS prefixes"
+confirmed = false
+
+[defaults.markdown]
+# WHY: If a linter enforces it (markdownlint), it goes in config.
+# If it is a style preference no tool enforces, it goes in norms.
+max_heading_depth = 4             # enforceable: markdownlint MD001/MD003
+code_fences_required = true       # enforceable: markdownlint MD040
+confirmed = false                 # verify against .markdownlint.json if present
+
+[defaults.norms]
+# Known org-wide norms applied to every repo unless contradicted locally.
+no_commented_out_code = "remove commented-out code before committing"
+privacy_aware_logging = "no secrets, tokens, or absolute paths in log output"
+no_print_statements = "use logging module; no print() in library or production code"
+explicit_exceptions = "always catch specific exception types; no bare except"
+markdown_sentence_per_line = "each sentence begins on a new line in Markdown files"
+
+[defaults.repo_hygiene]
+# WHY: These files should be present in every repo regardless of language.
+gitattributes_required = true     # WHY: Controls line endings and binary file handling.
+editorconfig_required = true      # WHY: Consistent indent style, charset, line endings across editors.
+gitignore_required = true
+license_required = true
+readme_required = true
+changelog_required = false        # set true for published packages
+dependabot_required = true        # WHY: Automated dependency updates.
+confirmed = false
+
+[defaults.ci]
+ci = "github-actions"
+branch_protection = "no direct push to main; all changes via PR"
+required_checks_before_merge = "ci must pass"
+pr_template = false               # set true if org requires PR templates
+confirmed = false
+
+[defaults.security]
+secret_scanning = true            # WHY: GitHub native secret scanning enabled.
+dependency_vulnerability_scanning = "dependabot alerts"
+confirmed = false
+
+[defaults.done]
+ci_must_pass = true
+review_required = ""              # [FILL] who must review; leave empty for solo projects
+definition = ""                   # [FILL] e.g., "all tests pass, ruff clean, pyright clean"
+deploy_process = ""               # [FILL] e.g., "merge to main triggers GitHub Pages deploy"
+confirmed = false
+
+[sources]
+# List repos AO should learn from when generating ao-context.toml.
+# Remove this section if populating ao-config.toml manually.
+
+[sources.ignore]
+paths = ["dist/", "build/", ".venv/", "archive/", "__pycache__/", "*.egg-info/"]

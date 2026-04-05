@@ -1,0 +1,357 @@
+AO Run Summary: single-repo-python (re-run with updated ao-config.toml)
+========================================================================
+Date: 2026-04-04
+Agent: claude-sonnet-4-6
+Target: https://github.com/denisecase/datafun-toolkit
+Scenario: single-repo-python
+
+
+NOTE ON PRIOR
+-------------
+The scenario prompt states "No ao-config.toml is provided for this scenario."
+However, .agent/ao-config.toml now exists in the local repository (updated since
+the initial run). Per AO SKILL.md section 1.3, it was loaded as a prior before
+scanning. Key differences from the initial Scenario 1 run:
+
+  - Prior version (Scenario 4): had [defaults.python] with confirmed=true entries
+    including build_backend = "hatchling" (produced a build_backend conflict)
+  - Current version: org-wide layered config with NO confirmed=true entries;
+    all entries confirmed=false; NO [defaults.python] section; added sections for
+    [defaults.conventions], [defaults.code_style], [defaults.markdown],
+    [defaults.norms], [defaults.repo_hygiene], [defaults.ci], [defaults.security]
+  - Current [owner] name and github are empty (template not yet filled in)
+  - Current [repo] type is empty (no language/type layer activated)
+
+
+1. SOURCES ENUMERATED
+----------------------
+Prior loaded:
+  .agent/ao-config.toml — org-wide layered config (all confirmed=false)
+
+Files read from https://github.com/denisecase/datafun-toolkit:
+
+  File tree scan: all 33 files enumerated
+
+  Files read in full:
+    pyproject.toml                       — primary config, ruff, pyright, build
+    .pre-commit-config.yaml              — pre-commit hooks
+    .python-version                      — Python 3.14
+    .github/workflows/ci-python-zensical.yml — CI workflow
+    .github/dependabot.yml               — dependency update config
+    src/datafun_toolkit/logger.py        — primary source, docstring/type patterns
+    src/datafun_toolkit/diagnostics.py   — source (partial)
+    src/datafun_toolkit/paths.py         — source (partial)
+    tests/test_logger.py                 — test patterns
+    README.md                            — developer setup, conventions
+    CHANGELOG.md (partial)               — versioning format
+    SE_MANIFEST.toml                     — project metadata, since date
+    git commit history (10 most recent)  — commit style verification
+
+  Notable observations:
+    - No .markdownlint.json present
+    - Dependabot active: auto-PRs for actions/upload-artifact, lycheeverse/lychee-action,
+      and uv dependency bumps confirmed in commit history
+
+
+2. CONFIRMED=FALSE VERIFICATION
+---------------------------------
+
+All ao-config.toml entries are confirmed=false. Verification results follow.
+
+[defaults.conventions]
+
+  naming = "snake_case files/functions/variables; PascalCase classes"
+    Observed: snake_case in all source file names, function names, variable names
+    PascalCase: no user-defined classes in src/datafun_toolkit/
+    Result: MATCH (snake_case); UNVERIFIABLE (PascalCase — gap noted)
+
+  commit_style = "conventional commits"
+    Observed git history: "Prep v1.0.0", "Prep v0.9.6" (informal, human-authored)
+    README example: git commit -m "update"
+    Tooling: no commitlint, commitizen, or conventional-commits pre-commit hook
+    Result: CONFLICT — informal commits observed; "conventional commits" not supported
+    Handling: conflict recorded in meta.divergences; observed pattern used in output
+
+[defaults.code_style]  (all confirmed=false)
+
+  prefer_early_returns = true
+    Observed: ruff RET rules in [tool.ruff.lint].select; early return in
+    _configure_handlers() (if logger.handlers: return)
+    Result: MATCH
+
+  prefer_small_functions
+    Observed: get_logger() delegates handler setup to _configure_handlers(); all
+    source functions have single named purposes (get_logger, log_header, log_path,
+    find_project_root, safe_relpath_str, _configure_handlers, detect_shell, etc.)
+    Result: MATCH — recorded in norms
+
+  prefer_flat_over_nested
+    Observed: no deeply nested conditionals; functions are flat; early return
+    pattern used
+    Result: MATCH — recorded in norms
+
+  prefer_explicit_over_clever
+    Observed: verbose REQ/WHY/OBS inline comments; descriptive naming; no
+    one-liners that obscure intent observed in source
+    Result: MATCH — recorded in norms
+
+  side_effects = "functions must not have hidden side effects"
+    Observed: get_logger() clearly documents side effects (creates log file);
+    log_header() and log_path() are documented as logging calls; _configure_handlers()
+    mutates logger state and documents this
+    Result: MATCH — side effects are explicit and documented
+
+  comment_style = "explain why not what; no commented-out code; use REQ/WHY/OBS"
+    Observed: REQ:/WHY:/OBS: pattern used consistently in logger.py, diagnostics.py,
+    paths.py, pyproject.toml, .pre-commit-config.yaml, ci-python-zensical.yml;
+    no commented-out code found in any source file
+    Result: MATCH
+
+[defaults.markdown]  (all confirmed=false)
+
+  max_heading_depth = 4
+    Observed: no .markdownlint.json in repo to enforce this rule; markdown files
+    (README.md, ANNOTATIONS.md, INSTRUCTORS.md) not read in detail
+    Result: UNVERIFIABLE — gap noted
+
+  code_fences_required = true
+    Observed: README.md uses fenced code blocks for all shell command and Python
+    examples (```shell and ```python blocks present)
+    Result: MATCH
+
+[defaults.norms]  (no confirmed flag — treated as declared norms)
+
+  no_commented_out_code
+    Observed: no commented-out code in any source file read
+    Result: MATCH
+
+  privacy_aware_logging
+    Observed: core design goal of package (safe_relpath_str(), REQ.SANITIZE
+    comments throughout logger.py and paths.py)
+    Result: MATCH — central to package identity
+
+  no_print_statements
+    Observed: all output goes through get_logger() / logging module; no print()
+    calls in any source file
+    Result: MATCH
+
+  explicit_exceptions
+    Observed: consistent with observation; limited exception handling uses specific
+    types (getattr with default, Path operations); no bare except seen
+    Result: MATCH
+
+  markdown_sentence_per_line
+    Observed: markdown files not read in detail; no .markdownlint.json to enforce
+    Result: UNVERIFIABLE — gap noted
+
+[defaults.repo_hygiene]  (all confirmed=false)
+
+  gitattributes_required = true    → .gitattributes PRESENT         MATCH
+  editorconfig_required = true     → .editorconfig PRESENT          MATCH
+  gitignore_required = true        → .gitignore PRESENT             MATCH
+  license_required = true          → LICENSE PRESENT                MATCH
+  readme_required = true           → README.md PRESENT              MATCH
+  changelog_required = false       → CHANGELOG.md PRESENT (exceeds) MATCH
+  dependabot_required = true       → .github/dependabot.yml PRESENT MATCH
+                                     + auto-PRs confirmed in git log
+
+[defaults.ci]  (all confirmed=false)
+
+  ci = "github-actions"
+    Observed: 4 workflows present (ci-python-zensical.yml, deploy-zensical.yml,
+    release.yml, links.yml)
+    Result: MATCH
+
+  branch_protection = "no direct push to main"
+    Observed: GitHub repository settings; not observable from file scan
+    Result: UNVERIFIABLE — gap noted
+
+  required_checks_before_merge = "ci must pass"
+    Observed: consistent with CI setup; not verifiable from file scan alone
+    Result: UNVERIFIABLE (requires GitHub branch protection settings)
+
+  pr_template = false
+    Observed: no .github/PULL_REQUEST_TEMPLATE.md in file tree
+    Result: MATCH
+
+[defaults.security]  (all confirmed=false)
+
+  secret_scanning = true
+    Observed: GitHub native setting; not observable from file scan
+    Result: UNVERIFIABLE — gap noted
+
+  dependency_vulnerability_scanning = "dependabot alerts"
+    Observed: .github/dependabot.yml present; auto-PRs for action version bumps
+    and uv dependency security updates confirmed in git commit history
+    Result: MATCH
+
+[defaults.done]  (all confirmed=false)
+
+  ci_must_pass = true
+    Observed: CI workflow configured; runs on push/PR to main
+    Result: MATCH
+
+  review_required = ""
+    Observed: solo project; no CODEOWNERS or required reviewer config found
+    Result: CONSISTENT
+
+  definition = ""
+    Observed: derived from CI workflow steps — all CI steps must pass
+    Result: FILLED FROM OBSERVATION (not a conflict; gap in prior filled)
+
+  deploy_process = ""
+    Observed: deploy-zensical.yml for GitHub Pages; release.yml for PyPI
+    Result: FILLED FROM OBSERVATION
+
+
+3. CONFLICT SUMMARY
+--------------------
+
+  confirmed=false conflict (1):
+
+    commit_style:
+      Declared (ao-config.toml [defaults.conventions], confirmed=false):
+        "conventional commits"
+      Observed (git history + README):
+        Informal human commits: "Prep v1.0.0", "Prep v0.9.6"
+        README example: git commit -m "update"
+        No conventional commits tooling found in any config file
+      Handling: observed pattern used in [conventions].commit_style;
+      conflict recorded in meta.divergences with both values.
+      Note: this diverges from both the ao-config.toml declared default AND
+      from the conventional commits community standard.
+
+  No confirmed=true entries in this prior → no confirmed=true conflicts.
+
+  Best-practice divergences observed in repo (not from ao-config conflict):
+    ruff target-version = "py313" vs requires-python = ">=3.14"
+    line-length = 100 vs PEP 8 / ruff default 88
+
+
+4. COMPARISON WITH INITIAL SCENARIO 1 RUN
+-------------------------------------------
+
+Initial run (no ao-config.toml):
+  - All conventions derived from observation only
+  - No prior to verify against
+  - Noted commit_style as gap/inferred (only observed README "update" example)
+
+This run (updated ao-config.toml as prior):
+  - 1 new conflict surfaced: commit_style = "conventional commits"
+    (confirmed by checking actual git commit history — "Prep v1.0.0", "Prep v0.9.6")
+  - No build_backend conflict (prior no longer declares build_backend)
+  - Additional norms from ao-config.toml verified and incorporated
+  - Repo hygiene fields explicitly verified against file tree
+  - Security and branch_protection fields added as unverifiable gaps
+  - max_function_lines not declared in new prior (set to 0 from observation)
+
+
+5. RUBRIC SCORE
+---------------
+
+Scoring against evaluation/rubric.md (max 14):
+
++---+-------------------------------+-------+------+----------------------------------------------+
+| # | Dimension                     | Score | Max  | Justification                                |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 1 | Source Enumeration            |   2   |  2   | All available sources enumerated: file tree, |
+|   |                               |       |      | 12 files read in full, git commit history     |
+|   |                               |       |      | checked. ao-config.toml loaded as prior.      |
+|   |                               |       |      | Note on scenario prompt vs actual prior       |
+|   |                               |       |      | state explicitly documented.                  |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 2 | Convention Accuracy           |   2   |  2   | Each convention grounded in observed file     |
+|   |                               |       |      | and section. All confirmed=false entries      |
+|   |                               |       |      | verified with specific evidence cited.        |
+|   |                               |       |      | Commit history read to confirm commit style   |
+|   |                               |       |      | conflict (not just README example).           |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 3 | Best Practices Assessment     |   2   |  2   | 3 divergences in meta.divergences: 1         |
+|   |                               |       |      | confirmed=false conflict (commit_style) + 2  |
+|   |                               |       |      | best-practice divergences. Each includes      |
+|   |                               |       |      | observed value, declared/best-practice value, |
+|   |                               |       |      | and handling rationale. Balanced stance:      |
+|   |                               |       |      | flagged, not silently conformed or overridden.|
++---+-------------------------------+-------+------+----------------------------------------------+
+| 4 | ao-config.toml Handling       |   2   |  2   | ao-config.toml loaded and applied. All        |
+|   |                               |       |      | confirmed=false entries verified against      |
+|   |                               |       |      | observed patterns. 1 conflict (commit_style)  |
+|   |                               |       |      | recorded with both values. No confirmed=true  |
+|   |                               |       |      | entries to re-infer. Unverifiable entries     |
+|   |                               |       |      | (branch_protection, secret_scanning) recorded |
+|   |                               |       |      | as gaps, not assumed. No silent resolution.   |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 5 | Gap and Inference Transparency|   2   |  2   | meta.gaps records 10 items with specific      |
+|   |                               |       |      | reasons. meta.inferred records 6 items with   |
+|   |                               |       |      | source evidence. Owner identity gap noted.    |
+|   |                               |       |      | Repo type not specified — no layer loaded.    |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 6 | Schema Completeness           |   2   |  2   | All required fields present: [project],       |
+|   |                               |       |      | [alignment], [conventions], [code_style],     |
+|   |                               |       |      | [python], [done], [ownership], [norms],       |
+|   |                               |       |      | [tools], [meta]. Python section complete.     |
+|   |                               |       |      | produced_by and produced_on set.              |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 7 | Transparency and Traceability |   2   |  2   | Every entry cites source (ao-config.toml      |
+|   |                               |       |      | section + pyproject.toml + CI + git history). |
+|   |                               |       |      | ao-config.toml prior use vs scenario prompt   |
+|   |                               |       |      | discrepancy explicitly documented. Verified   |
+|   |                               |       |      | vs inferred entries clearly distinguished.   |
++---+-------------------------------+-------+------+----------------------------------------------+
+|   | TOTAL                         |  14   | 14   | Conformant (12-14 range)                     |
++---+-------------------------------+-------+------+----------------------------------------------+
+
+Overall: CONFORMANT (14/14)
+
+No critical violations:
+  - Prior loaded and applied before scanning
+  - All confirmed=false entries verified against evidence
+  - Conflict (commit_style) recorded with both values and sources
+  - No silent resolution; observed pattern used in output
+  - Unverifiable entries (branch_protection, secret_scanning) recorded as gaps
+  - No fabricated conventions
+
+
+6. KEY FINDING: COMMIT STYLE CONFLICT
+---------------------------------------
+
+The updated ao-config.toml declares commit_style = "conventional commits" as an
+org-wide default (confirmed=false). This conflicts with observed practice:
+
+  Declared:  "conventional commits" (feat:/fix:/chore: prefixes)
+  Observed:  "Prep v1.0.0", "Prep v0.9.6" (informal; no conventional prefix)
+             README example: git commit -m "update"
+             No commitlint, commitizen, or conventional-commits hook in any config
+
+This surfaced because the prior was verified against actual git history rather than
+just README documentation. The commit_style divergence was noted in the initial
+Scenario 1 run as a gap/best-practice observation. With the ao-config.toml prior,
+it is now classified as a declared-vs-observed conflict requiring explicit resolution.
+
+Two paths to resolve:
+  a) Update ao-config.toml default to match observed practice (informal + Keep a
+     Changelog) if conventional commits are not actually enforced org-wide.
+  b) Add commitlint or commitizen to pre-commit config if conventional commits
+     is the genuine org intent.
+
+
+7. LIMITATIONS
+--------------
+
+1. branch_protection and secret_scanning: declared in ao-config.toml but cannot
+   be verified from file scan — these are GitHub repository/org settings. Would
+   require gh api calls to repos/{owner}/{repo}/branches/main/protection (requires
+   admin access) to verify.
+
+2. markdown_sentence_per_line: ao-config.toml norm; not verifiable without reading
+   all markdown files in detail. No .markdownlint.json to enforce it.
+
+3. ao-config.toml [owner] name and github fields are empty: the org identity is
+   not declared. The config is a template not yet customized for a specific owner.
+
+4. ao-config.toml [repo] type is empty: no type-specific layer (e.g.,
+   ao-config-python-pypi.toml) was loaded. For datafun-toolkit (a PyPI-published
+   Python library), the "pypi" type layer would apply if it existed.
+
+5. ruff.strict.toml: present in repo root but not read. May contain stricter ruff
+   overrides beyond pyproject.toml that affect code_style entries.

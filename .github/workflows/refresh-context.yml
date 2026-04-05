@@ -1,0 +1,29 @@
+# ============================================================
+name: Refresh Agent Context
+# ============================================================
+# WHY-FILE: Periodically refresh agent context from SKILL.md using AO.
+# REQ: This workflow MUST run on a schedule and be manually triggerable.
+# REQ: It MUST use least privileges and only update .agent/context.toml based on SKILL.md.
+# OBS: This workflow is separate from CI to avoid side effects and maintain clear separation of concerns.
+
+on:
+  schedule:
+    - cron: "0 6 * * 0"   # weekly, Sunday 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run AO refresh
+        run: |
+          # invoke this skill via Claude Code or equivalent agent runner
+          echo "AO refresh: implement with your agent runner"
+      - name: Commit updated context
+        run: |
+          git config user.name "ao-refresh-bot"
+          git config user.email "bot@noreply"
+          git add .agent/ao-context.toml
+          git diff --cached --quiet || git commit -m "chore: refresh agent context [auto]"
+          git push

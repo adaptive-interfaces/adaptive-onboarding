@@ -1,0 +1,76 @@
+# ============================================================
+# adaptive-onboarding/MANIFEST.toml
+# ============================================================
+
+schema = "adaptive-interfaces-manifest-1"
+schema_url = "https://github.com/adaptive-interfaces/.github/blob/main/schemas/adaptive-interfaces-manifest-1.md"
+
+[meta]
+framework = "Adaptive Interfaces"
+framework_url = "https://github.com/adaptive-interfaces"
+framework_note = "Provides definitions and conventions for adaptive-interfaces manifest semantics."
+description = "Declarative claim of repository intent, scope, and role."
+purpose = "To make explicit the boundaries, responsibilities, and expectations of this repository relative to others."
+
+[repo]
+name = "adaptive-onboarding"
+kind = "domain-skill"
+description = "Defines the schema and skill for capturing team conventions in a persistent, agent-readable format so agents produce team-conforming output from the first session."
+
+[layer]
+space = "Agent Engineering"
+role = "domain-skill"
+
+[depends]
+required = [
+  "adaptive-conformance-specification",
+  "claude-code>=1.0",
+]
+optional = [
+  "adaptive-tool-discovery",
+  "uvx",
+  "nodejs>=20",
+  "npx",
+]
+
+[provides]
+artifacts = [
+  "SKILL.md",
+  "MANIFEST.toml",
+  "DECISIONS.md",
+  "HANDBOOK.md",
+  "CITATION.cff",
+  "LICENSE",
+  "README.md",
+  "evaluation/rubric.md",
+  "evaluation/scenarios/",
+  ".agent/ao-config.toml",
+  ".agent/ao-config-python.toml",
+  ".agent/ao-config-python-pypi.toml",
+  ".agent/ao-config-python-scaffold.toml",
+  ".agent/ao-config-node.toml",
+  ".agent/ao-context.toml",
+]
+
+[scope]
+includes = [
+  "AO schema definition: the shared format for ao-config and ao-context files",
+  "layered config file design: org-wide, language, and type-specific layers",
+  "SKILL.md: specification for agent-generated ao-context.toml",
+  "HANDBOOK.md: companion template for human-only team conventions",
+  "evaluation scenarios and rubric for onboarding quality",
+  "starter config files for Python, PyPI, scaffold, and Node repos",
+]
+excludes = [
+  "tool capability mapping (see adaptive-tool-discovery)",
+  "observation and conformance discipline (governed by ACS)",
+  "domain-specific knowledge (captured in ao-domain.toml per project)",
+  "post-onboarding verification of agent understanding",
+]
+
+[citation]
+cff = "CITATION.cff"
+preferred = "repo"
+
+[traceability]
+identifier_map = "none"

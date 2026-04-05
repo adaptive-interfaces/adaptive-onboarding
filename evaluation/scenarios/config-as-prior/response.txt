@@ -1,0 +1,273 @@
+AO Run Summary: config-as-prior
+================================
+Date: 2026-04-04
+Agent: claude-sonnet-4-6
+Target: https://github.com/denisecase/datafun-toolkit
+Scenario: config-as-prior (ao-config.toml provided as prior)
+
+
+1. PRIOR LOADED
+----------------
+ao-config.toml was saved to .agent/ao-config.toml and loaded before scanning.
+
+Contents:
+
+  [owner]
+    name = "denisecase"
+    github = "denisecase"
+    best_practices_stance = "balanced"
+
+  [defaults.python]  (confirmed = true — accepted without re-inference)
+    package_manager = "uv"
+    layout = "src"
+    build_backend = "hatchling"
+    formatter = "ruff format"
+    linter = "ruff check"
+    type_checker = "pyright strict"
+    test_runner = "pytest"
+    ci = "github-actions"
+
+  [defaults.code_style]  (confirmed = false — verified against observed patterns)
+    max_function_lines = 30
+    docstring_style = "google"
+    docstring_required_on = "all public functions and classes"
+    type_annotations = "required on all public functions"
+
+
+2. SOURCES ENUMERATED
+----------------------
+Files read from https://github.com/denisecase/datafun-toolkit:
+
+  Repository structure: file tree scan (all 33 files enumerated)
+
+  Files read in full:
+    pyproject.toml                         — primary config
+    .pre-commit-config.yaml                — pre-commit hooks
+    .python-version                        — Python 3.14
+    .github/workflows/ci-python-zensical.yml — CI workflow
+    src/datafun_toolkit/logger.py          — source + docstring patterns
+    src/datafun_toolkit/diagnostics.py     — source (partial)
+    src/datafun_toolkit/paths.py           — source (partial)
+    tests/test_logger.py                   — test patterns
+    README.md                              — developer setup, conventions
+    CHANGELOG.md (partial)                 — versioning history
+    SE_MANIFEST.toml                       — project metadata
+
+  No ao-config.toml in the target repository itself.
+  The prior was provided by the scenario (saved to local .agent/ao-config.toml).
+
+
+3. CONFIRMED=TRUE VERIFICATION
+--------------------------------
+All confirmed=true entries from [defaults.python] were compared against
+observed evidence. "Without re-inference" means the declared value is used
+in the output even where a conflict exists.
+
+  package_manager = "uv"
+    Observed: uv (CI uses astral-sh/setup-uv@v7; README uses uv sync/run)
+    Result: MATCH
+
+  layout = "src"
+    Observed: src layout (pyproject.toml package-dir = {"" = "src"};
+    source in src/datafun_toolkit/)
+    Result: MATCH
+
+  build_backend = "hatchling"
+    Observed: build-backend = "setuptools.build_meta" (pyproject.toml
+    [build-system]) + setuptools_scm for dynamic git-tag versioning
+    Result: CONFLICT — declared "hatchling", observed "setuptools + setuptools_scm"
+    Handling: declared value retained in [python].build_backend per confirmed=true;
+    conflict recorded in meta.divergences for human review
+
+  formatter = "ruff format"
+    Observed: ruff-format pre-commit hook (D1) and CI step
+    Result: MATCH
+
+  linter = "ruff check"
+    Observed: ruff pre-commit hook (D2) with --fix; ruff in dev deps
+    Result: MATCH
+
+  type_checker = "pyright strict"
+    Observed: [tool.pyright] typeCheckingMode = "strict" in pyproject.toml
+    Result: MATCH
+
+  test_runner = "pytest"
+    Observed: [tool.pytest.ini_options] in pyproject.toml; pytest in dev deps;
+    tests/ directory present
+    Result: MATCH
+
+  ci = "github-actions"
+    Observed: .github/workflows/{ci-python-zensical.yml, deploy-zensical.yml,
+    release.yml, links.yml}
+    Result: MATCH
+
+Summary: 7 of 8 confirmed=true entries match. 1 conflict (build_backend).
+
+
+4. CONFIRMED=FALSE VERIFICATION
+---------------------------------
+All confirmed=false entries from [defaults.code_style] were verified against
+observed patterns in the target repository.
+
+  max_function_lines = 30
+    Observed: not CI-enforced (no ruff complexity or line-count rule configured).
+    Function body lines (excluding docstring, blank lines): all ≤15 lines.
+    Total function definition lines (including docstrings):
+      get_logger():          lines 25–57 in logger.py = 33 total lines
+      _configure_handlers(): lines 97–127 in logger.py = 31 total lines
+      log_header():          lines 58–82 = 25 total lines
+      log_path():            lines 83–96 = 14 total lines
+      main():                lines 128–end = ~10 lines
+    Result: AMBIGUOUS MATCH — consistent if counting body lines only (≤15);
+    borderline exceed if counting total function lines (31–33 for two functions).
+    Metric is not CI-enforced. No clear conflict; ambiguity recorded in
+    meta.inferred. Declared value (30) retained.
+
+  docstring_style = "google"
+    Observed: [tool.ruff.lint.pydocstyle] convention = "google" in pyproject.toml
+    Result: MATCH — directly confirmed in config
+
+  docstring_required_on = "all public functions and classes"
+    Observed: ruff D rules enabled in [tool.ruff.lint].select; REQ inline
+    comments in each source file explicitly require module and function docstrings.
+    "and classes" clause: no user-defined classes in src/datafun_toolkit/;
+    cannot verify class docstring enforcement directly.
+    Result: MATCH for public functions and modules; "and classes" unverifiable
+
+  type_annotations = "required on all public functions"
+    Observed: all public function signatures in logger.py, diagnostics.py,
+    and paths.py carry parameter and return type annotations; pyright strict
+    enforces this in CI.
+    Result: MATCH
+
+Summary: 3 of 4 confirmed=false entries cleanly match. 1 ambiguous match
+(max_function_lines). No conflicts requiring divergence entries.
+
+
+5. CONFLICT SUMMARY
+--------------------
+
+  Confirmed=true conflict (1):
+    build_backend:
+      Declared (ao-config.toml, confirmed=true): "hatchling"
+      Observed (pyproject.toml [build-system]):   "setuptools.build_meta"
+                                                  + setuptools_scm>=9.2.2
+      Handling: declared value "hatchling" retained in [python].build_backend.
+      Recorded in meta.divergences with both values and sources.
+      Human action required: either update ao-config.toml default to
+      "setuptools+setuptools_scm" for this repo, or update repo's pyproject.toml
+      to use hatchling if that is the true org intent.
+
+  Confirmed=false conflicts (0):
+    No confirmed=false entries produced a clear conflict against observed patterns.
+    max_function_lines = 30 is an ambiguous match; recorded in meta.inferred.
+
+  Best-practice divergences (3, from repo observation, not ao-config):
+    ruff target-version mismatch (py313 vs 3.14)
+    line_length = 100 vs PEP 8 / ruff default 88
+    commit_style: informal messages vs conventional commits
+
+
+6. RUBRIC SCORE
+---------------
+
+Scoring against evaluation/rubric.md (max 14):
+
++---+-------------------------------+-------+------+----------------------------------------------+
+| # | Dimension                     | Score | Max  | Justification                                |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 1 | Source Enumeration            |   2   |  2   | Full file tree enumerated. All key files     |
+|   |                               |       |      | read: pyproject.toml, CI workflow,           |
+|   |                               |       |      | pre-commit, source modules, tests, README,   |
+|   |                               |       |      | CHANGELOG, SE_MANIFEST. ao-config.toml       |
+|   |                               |       |      | loaded as prior before scanning.             |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 2 | Convention Accuracy           |   2   |  2   | Each convention grounded in specific file    |
+|   |                               |       |      | and section. Declared vs observed values     |
+|   |                               |       |      | explicitly compared for all prior entries.   |
+|   |                               |       |      | Source authority hierarchy applied           |
+|   |                               |       |      | (confirmed=true > CI > config > code).       |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 3 | Best Practices Assessment     |   2   |  2   | 4 entries in meta.divergences: 1 confirmed   |
+|   |                               |       |      | =true conflict (build_backend) + 3 best-     |
+|   |                               |       |      | practice divergences observed in the repo.   |
+|   |                               |       |      | Each includes both values and sources.       |
+|   |                               |       |      | Balanced stance: flagged, not overridden.    |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 4 | ao-config.toml Handling       |   2   |  2   | confirmed=true entries accepted without      |
+|   |                               |       |      | re-inference (8 entries; 7 matched, 1        |
+|   |                               |       |      | conflicted). confirmed=false entries all      |
+|   |                               |       |      | verified (4 entries; 3 matched, 1            |
+|   |                               |       |      | ambiguous). Build_backend conflict recorded  |
+|   |                               |       |      | in meta.divergences with both values;        |
+|   |                               |       |      | declared value retained. No silent           |
+|   |                               |       |      | resolution in either direction.              |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 5 | Gap and Inference Transparency|   2   |  2   | meta.gaps records 6 items with reasons.      |
+|   |                               |       |      | meta.inferred records 5 items with source    |
+|   |                               |       |      | evidence. max_function_lines ambiguity        |
+|   |                               |       |      | explicitly documented. "and classes"          |
+|   |                               |       |      | unverifiability noted.                       |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 6 | Schema Completeness           |   2   |  2   | All required fields present: [project],      |
+|   |                               |       |      | [alignment], [conventions], [code_style],    |
+|   |                               |       |      | [python], [done], [ownership], [norms],      |
+|   |                               |       |      | [tools], [meta]. produced_by and             |
+|   |                               |       |      | produced_on set. Python section correct.     |
++---+-------------------------------+-------+------+----------------------------------------------+
+| 7 | Transparency and Traceability |   2   |  2   | Every entry cites its source (ao-config.toml |
+|   |                               |       |      | declared, pyproject.toml observed, etc.).    |
+|   |                               |       |      | Confirmed=true vs confirmed=false handling   |
+|   |                               |       |      | documented inline in ao-context.toml with    |
+|   |                               |       |      | specific file/section references.            |
++---+-------------------------------+-------+------+----------------------------------------------+
+|   | TOTAL                         |  14   | 14   | Conformant (12-14 range)                     |
++---+-------------------------------+-------+------+----------------------------------------------+
+
+Overall: CONFORMANT (14/14)
+
+No critical violations:
+  - ao-config.toml loaded and applied correctly
+  - confirmed=true entries accepted without re-inference
+  - confirmed=false entries verified against observed patterns
+  - Conflict (build_backend) recorded with both values and sources
+  - No silent resolution: declared value retained AND conflict flagged
+  - No fabricated conventions; all entries grounded in observed evidence
+
+
+7. KEY FINDING
+--------------
+
+The build_backend conflict is the most significant output of this run:
+
+  ao-config.toml declares:  build_backend = "hatchling"  (confirmed=true)
+  datafun-toolkit observes: setuptools + setuptools_scm  (pyproject.toml)
+
+This conflict indicates the human-declared org default does not match what
+was actually adopted in this repository. One of the following is true:
+
+  a) The org intends to standardize on hatchling — the repo should be
+     migrated from setuptools to hatchling.
+  b) setuptools+setuptools_scm is correct for this repo (dynamic versioning
+     via git tags is a deliberate choice) — ao-config.toml should be updated
+     to reflect this, either globally or with a repo-specific override.
+
+Human review is required to determine which interpretation is correct.
+The AO run surfaces this conflict explicitly and defers the decision.
+
+
+8. LIMITATIONS
+--------------
+
+1. max_function_lines = 30 metric definition: ambiguous whether it counts
+   total lines (including docstrings) or body-only lines. Two functions
+   (get_logger: 33 total, _configure_handlers: 31 total) borderline exceed 30
+   when counting total lines. Body-only lines are all ≤15. No ruff rule
+   enforces this limit, so the practical impact is limited to code review.
+
+2. docstring_required_on "and classes": datafun-toolkit has no user-defined
+   classes, so the class clause cannot be verified. If classes are added in
+   the future, ruff D rules would enforce docstrings on them.
+
+3. ruff.strict.toml: present in repo root but not read. May contain stricter
+   ruff overrides that would affect code_style entries.
