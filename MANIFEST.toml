@@ -24,7 +24,7 @@ role = "domain-skill"
 [depends]
 required = [
   "adaptive-conformance-specification",
-  "claude-code>=1.0",
+
 ]
 optional = [
   "adaptive-tool-discovery",
