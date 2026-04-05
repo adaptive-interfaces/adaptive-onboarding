@@ -13,34 +13,34 @@ see `.agent/ao-config.toml` and its language and type layers instead.
 
 ## What belongs here vs in AO config
 
-| AO config (`.agent/`) | Handbook (this file) |
-|---|---|
-| Toolchain and linter config | On-call rotation and escalation |
-| Test conventions and coverage | Incident severity definitions |
-| Docstring style | How to run a postmortem |
-| Branch protection rules | Team meeting cadence |
-| PR template requirements | How to request time off |
-| Dependabot configuration | Budget approval process |
-| Logging and exception conventions | Vendor relationships |
-| Release workflow | Promotion and performance criteria |
+| AO config (`.agent/`)             | Handbook (this file)               |
+| --------------------------------- | ---------------------------------- |
+| Toolchain and linter config       | On-call rotation and escalation    |
+| Test conventions and coverage     | Incident severity definitions      |
+| Docstring style                   | How to run a postmortem            |
+| Branch protection rules           | Team meeting cadence               |
+| PR template requirements          | How to request time off            |
+| Dependabot configuration          | Budget approval process            |
+| Logging and exception conventions | Vendor relationships               |
+| Release workflow                  | Promotion and performance criteria |
 
 ## Team
 
 | Name | Role | GitHub | Areas |
-|---|---|---|---|
-| | | | |
+| ---- | ---- | ------ | ----- |
+|      |      |        |       |
 
 ## Communication
 
 | Channel | Purpose |
-|---|---|
-| | |
+| ------- | ------- |
+|         |         |
 
 ## Meetings
 
 | Meeting | Cadence | Purpose |
-|---|---|---|
-| | | |
+| ------- | ------- | ------- |
+|         |         |         |
 
 ## On-Call and Incidents
 
@@ -51,10 +51,10 @@ see `.agent/ao-config.toml` and its language and type layers instead.
 ### Severity Levels
 
 | Level | Definition | Response Time |
-|---|---|---|
-| P0 | | Immediate |
-| P1 | | |
-| P2 | | |
+| ----- | ---------- | ------------- |
+| P0    |            | Immediate     |
+| P1    |            |               |
+| P2    |            |               |
 
 ### Escalation Path
 
@@ -93,8 +93,8 @@ see `.agent/ao-config.toml` and its language and type layers instead.
 ## Environments
 
 | Name | Purpose | Access |
-|---|---|---|
-| | | |
+| ---- | ------- | ------ |
+|      |         |        |
 
 ## Monitoring and Alerting
 
