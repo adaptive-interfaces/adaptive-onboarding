@@ -63,82 +63,9 @@ surface gaps between team intent and observed practice.
 ## The Schema
 
 Human and agent generated files use the same schema.
-For example:
 
-```toml
-[project]
-name = ""              # repository name
-description = ""       # one-sentence description of purpose
-since = ""             # year the project started, e.g. "2024"
-primary_language = ""  # e.g., "python"
-
-[alignment]
-# How the agent behaves when team conventions diverge from best practices.
-# prefer_team     - follow team conventions; flag divergences but do not override
-# balanced        - follow team conventions; flag significant divergences for human review
-# prefer_standard - follow best practices; flag where team conventions differ
-best_practices_stance = "balanced"
-
-[conventions]
-naming = ""            # e.g., "snake_case files/functions/variables; PascalCase classes"
-structure = ""         # e.g., "src layout: src/<package>/, tests/, docs/"
-style_enforced_by = "" # e.g., "ruff"
-test_pattern = ""      # e.g., "tests/ mirrors src/; test_<module>.py"
-commit_style = ""      # e.g., "conventional commits"
-
-[code_style]
-# Behavioral constraints for agents generating or refactoring code.
-# Set to 0 if not enforced by the team.
-max_function_lines = 0
-max_cyclomatic_complexity = 0
-max_nesting_depth = 0
-prefer_early_returns = true
-docstring_style = ""         # e.g., "google"
-docstring_required_on = ""   # e.g., "all public functions and classes"
-type_annotations = ""        # e.g., "required on all public functions; pyright strict"
-comment_style = ""           # e.g., "explain why not what; no commented-out code"
-import_order = ""            # e.g., "stdlib, third-party, local; absolute imports only"
-
-[python]
-# Omit this section for non-Python projects.
-package_manager = ""   # e.g., "uv"
-layout = ""            # e.g., "src"
-build_backend = ""     # e.g., "hatchling"
-formatter = ""         # e.g., "ruff format"
-linter = ""            # e.g., "ruff check"
-type_checker = ""      # e.g., "pyright strict"
-test_runner = ""       # e.g., "pytest"
-ci = ""                # e.g., "github-actions"
-
-[done]
-definition = ""        # e.g., "all tests pass, ruff clean, pyright clean"
-review_required = ""   # who must review before merge; omit for solo projects
-ci_must_pass = true
-deploy_process = ""    # e.g., "merge to main triggers GitHub Pages deploy"
-
-[ownership]
-# Map of codebase areas to owners.
-# Omit or leave empty for solo or single-owner projects.
-# example: api = "team-backend"
-
-[norms]
-# Unwritten conventions observed or declared for this codebase.
-# Add one key per norm; value is a short description.
-# example: uv_only = "do not use pip directly; all installs via uv"
-
-[tools]
-registry = ""          # path or URL to ATD tool registry; omit if not available
-
-[meta]
-produced_by = ""       # e.g., "claude-code" or a person's name
-produced_on = ""       # ISO date, e.g., "2026-04-04"
-refreshed_on = ""      # ISO date of last refresh; omit until first refresh
-gaps = []              # conventions that could not be determined
-inferred = []          # conventions inferred rather than directly observed
-                       # example: ["max_function_lines: inferred from code patterns, not CI-enforced"]
-divergences = []       # best-practice divergences observed
-                       # example: ["type_annotations: not enforced; diverges from pyright strict standard"]
-```
+- ao-config* = human written
+- ao-context* = agent written
 
 ## Using Initiation Files in an Agent Session
 
