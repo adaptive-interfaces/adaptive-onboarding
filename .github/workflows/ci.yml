@@ -52,7 +52,7 @@ jobs:
 
       - name: B2) Skill check
         # WHY: Validate that SKILL.md is well-formed and meets criteria for agent use.
-        uses: moonrunnerkc/skillcheck@v0.2.0
+        uses: moonrunnerkc/skillcheck@v1.1.0
         with:
           path: SKILL.md
           min-desc-score: 60
