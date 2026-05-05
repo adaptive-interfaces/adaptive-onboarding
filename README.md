@@ -1,7 +1,7 @@
 # adaptive-onboarding
 
 [![CI Status](https://github.com/adaptive-interfaces/adaptive-onboarding/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/adaptive-interfaces/adaptive-onboarding/actions/workflows/ci.yml)
-[![MIT](https://img.shields.io/badge/license-see%20LICENSE-yellow.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Check Links](https://github.com/adaptive-interfaces/adaptive-onboarding/actions/workflows/links.yml/badge.svg?branch=main)](https://github.com/adaptive-interfaces/adaptive-onboarding/actions/workflows/links.yml)
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/adaptive-interfaces/adaptive-onboarding/security)
 
@@ -98,7 +98,6 @@ adaptive-onboarding/
   SKILL.md              specification for agent-generated ao-context.toml
   MANIFEST.toml         repository intent, scope, and role
   DECISIONS.md          design history and rationale
-  LICENSE               MIT
   HANDBOOK.md           example of what is NOT part of AO
   evaluation/
     rubric.md           grading criteria for generated context quality
@@ -112,7 +111,7 @@ Recommended: format Markdown files with Prettier extension.
 Then run:
 
 ```shell
-npx markdownlint-cli2 "**/*.md"
+npx markdownlint-cli2 --fix
 uvx skillcheck SKILL.md --min-desc-score 75
 ```
 
